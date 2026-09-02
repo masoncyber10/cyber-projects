@@ -166,4 +166,4 @@ def lambda_handler(event, context):
         'body': json.dumps(f'Success! File content: {content}')
     }
 ```
-Analysis of the Lambda code: We must import the required libraries. 
+Analysis of the Lambda code: This is a test code to see whether the Lambda and S3 bucket policies work.
