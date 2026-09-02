@@ -1,15 +1,14 @@
 # Cross Account Lambda to S3 Access
-**Visual Diagram**
+## Visual Diagram
 
 <img width="650" height="536" alt="image" src="https://github.com/user-attachments/assets/6b1035fe-3e08-4e76-8c27-bf1f8eee414a" />
 
-**Project Overview**
+## Project Overview
 
-**Objective:** 
+### Objective:
 
 Build a secure cross-account IAM access pattern where a Lambda function in Account A can read/write to an S3 bucket in Account B using temporary credentials.
-
-**What I've learned:**
+### What I've learned:
 - IAM roles and policies
   - Trust and Permission Policy (Trust Relationship)
 - STS (Security Token Service) temporary credentials
@@ -22,7 +21,7 @@ STS (Security Token Service) should always be put in place and credential timer 
 making IAM roles for Lambda and S3, I realized that there is always a set of policies in place to give the certain role, user, or group
 depending on the situation limited access.
 
-**Step 1: Create Account A (Lambda) role**
+### Step 1: Create Account A (Lambda) role
 1. Go to IAM --> Roles --> Create role
 2. Select Lambda as a Service
 3. Name: LambdaAssumeRole
@@ -31,13 +30,13 @@ depending on the situation limited access.
 <img width="768" height="33" alt="image" src="https://github.com/user-attachments/assets/d3bda26d-b5e9-42a8-9e46-61c74eb48df4" />
 
 
-**Step 2 Create Account B (S3) role**
+### Step 2: Create Account B (S3) role
 1. Same step as Step 1
 2. Name: S3AccessRole
    
 <img width="157" height="32" alt="image" src="https://github.com/user-attachments/assets/83363a17-182a-46de-8353-30e109958dde" />
 
-**Step 3: Add permission to assume Account B**
+### Step 3: Add permission to assume Account B
 1. Add an inline policy under LambaAssumeRole
 2. Include Security Token Service (STS) in the policy
 3. Resource: Add the Account ID and Account B (S3AccessRole)
@@ -57,13 +56,13 @@ depending on the situation limited access.
 ```
 <img width="935" height="201" alt="image" src="https://github.com/user-attachments/assets/fb407fc3-fd07-4027-9bf8-a2a1a3d3c033" />
 
-**Step 4: Create S3 Bucket**
+### Step 4: Create S3 Bucket
 1. Go to S3 --> Create bucket
 2. Name: my-test-bucket-cloud#
    - The bucket will be used in the Lambda code
 
 
-**Step 5: Create the trust policy (S3AccessRole)**
+### Step 5: Create the trust policy (S3AccessRole)
 1. Go to the Trust Relationship and edit the policy
 2. Replace the default policy and implement the LambdaAssumeRole's ARN to establish trust Account A
 
@@ -81,7 +80,7 @@ depending on the situation limited access.
   ]
 }
 ```
-**Step 6: Adding S3 Permissions**
+### Step 6: Adding S3 Permissions**
 1. Under permissions in S3AccessRole, add an inline policy
    - The permission policy needs to allow S3 actions onto the bucket
    - Actions needed: _s3:GetObject_, _s3:PutObject_, _s3:ListBucket_'
@@ -108,7 +107,7 @@ depending on the situation limited access.
 }
 ```
 
-**Step 7: Lambda Function (did not write the code but needed to work on my coding implementation and analysis)**
+### Step 7: Lambda Function (did not write the code but needed to work on my coding implementation and analysis)**
 1. Create a function
 2. Name: CrossAccountS3Test
 3. Runtime: Python: 3.12
@@ -167,3 +166,23 @@ def lambda_handler(event, context):
     }
 ```
 Analysis of the Lambda code: This is a test code to see whether the Lambda and S3 bucket policies work.
+
+
+### API Gateway via API Endpoint Testing via GET/POST
+1. Go to API Gateway --> Create API --> Rest API
+2. Name: CrossAccountS3API
+3. Create method --> Method Type: POST --> Integration Type --> Lambda --> Lambda function --> Add Lambda function (CrossAccountS3Test)
+4. Do the same for GET
+5. Deploy API --> Stage Name: dev or test --> Wait a few minutes to test API --> Can test API under the Methods Tab for GET/POST
+6. Result should look like:
+
+<img width="552" height="54" alt="image" src="https://github.com/user-attachments/assets/9be42bf9-49ce-4bd1-b80e-c2ad5e81a3d7" />
+
+7. Testing the URL endpoints: 
+
+<img width="466" height="47" alt="image" src="https://github.com/user-attachments/assets/1bb5adb2-e0f7-4d4d-bcbe-3ccea3b54722" />
+
+
+<img width="1051" height="368" alt="image" src="https://github.com/user-attachments/assets/5fd053cc-4b7a-49ce-ad8b-ca82db6d491a" />
+
+
