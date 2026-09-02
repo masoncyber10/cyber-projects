@@ -185,4 +185,82 @@ Analysis of the Lambda code: This is a test code to see whether the Lambda and S
 
 <img width="1051" height="368" alt="image" src="https://github.com/user-attachments/assets/5fd053cc-4b7a-49ce-ad8b-ca82db6d491a" />
 
+### Text file was also created in the Lambda code 
+
+<img width="1614" height="181" alt="image" src="https://github.com/user-attachments/assets/87afb94e-52c3-4384-a166-325ef09cca80" />
+
+
+### Troubleshooting (AI-Assisted Claude)
+### Issues Encountered
+#### Issue 1: Capitalization in assume_role() Call
+
+Error: RoleARN parameter not recognized Root Cause: Wrong parameter name capitalization Solution: Change RoleARN → RoleArn (capital A, lowercase rn) Lesson: AWS SDK parameter names are case-sensitive
+
+#### Issue 2: Credentials Dictionary Key Capitalization
+
+Error: KeyError when accessing credentials Code: credentials = assume_role['credentials'] Root Cause: Key is capitalized: Credentials not credentials Solution: Change to assume_role['Credentials'] Lesson: JSON keys are case-sensitive
+
+#### Issue 3: Wrong S3 Client Parameter Name
+
+Error: aws_access_key not recognized Code: s3_client = boto3.client('s3', aws_access_key=...) Root Cause: Parameter name is aws_access_key_id, not aws_access_key Solution: Change to aws_access_key_id Lesson: Always check exact parameter names in AWS SDK
+
+#### Issue 4: Confused put_object() and get_object()
+
+Error: Trying to pass Body parameter to get_object() Root Cause: Reversed the methods
+
+put_object() writes (has Body parameter)
+get_object() reads (returns Body) Solution: Use put_object() to write, then get_object() to read Lesson: Understand what each method does before using it
+#### Issue 5: Handler 'lambda_handler' Missing
+
+Error: "Handler 'lambda_handler' missing on module 'lambda_function'" Root Cause: Code not wrapped in required function Solution: Wrap all code in def lambda_handler(event, context): Lesson: Lambda requires specific function signature
+
+#### Issue 6: Missing S3 Resource ARNs
+
+Error: Warning about missing accesspoint and object resource ARNs Root Cause: Only specified one S3 ARN, needed two Solution: Add both:
+
+arn:aws:s3:::bucket-name (for bucket operations)
+arn:aws:s3:::bucket-name/* (for object operations) Lesson: Different S3 operations need different resource ARNs
+#### Issue 7: Browser GET vs POST
+
+Error: "Missing Authentication Token" Root Cause: Opened URL in browser (GET request) but API only has POST method Solution: Use curl, Postman, or API Gateway Test (makes POST requests) Lesson: Browser only makes GET requests; need tools for other methods
+
+#### Issue 8: ForbiddenException from API Gateway
+
+Error: x-amzn-errortype: ForbiddenException Root Cause: API Gateway doesn't have permission to invoke Lambda Solution: Add Lambda permission via CLI:
+
+bash
+aws lambda add-permission \
+  --function-name CrossAccountS3Test \
+  --principal apigateway.amazonaws.com \
+  --action lambda:InvokeFunction \
+  --source-arn "arn:aws:execute-api:REGION:ACCOUNT-ID:API-ID/dev/POST/"
+
+Lesson: Services need explicit permissions to call other services
+
+#### Issue 9: Missing Lambda Service Trust Policy
+
+Error: "API Gateway does not have permission to assume the provided role" Root Cause: LambdaAssumeRole didn't have Lambda service principal in trust policy Solution: Add trust policy to LambdaAssumeRole:
+
+json
+{
+  "Effect": "Allow",
+  "Principal": {
+    "Service": "lambda.amazonaws.com"
+  },
+  "Action": "sts:AssumeRole"
+}
+
+Lesson: Lambda function needs permission to use the execution role
+
+#### Issue 10: API Method Not Created
+
+Error: "Missing Authentication Token" even after fixing everything Root Cause: POST method never created in API Gateway Solution:
+
+Go to API Gateway → Resources
+Create POST method on / resource
+Link to Lambda function
+Deploy to dev stage Lesson: Must create and deploy methods in API Gateway
+#### Issue 11: Changes Not Reflected
+
+Error: After modifying API, still getting old responses Root Cause: Didn't deploy API after changes Solution: Click "Deploy API" after any changes Lesson: API Gateway requires explicit deployment
 
