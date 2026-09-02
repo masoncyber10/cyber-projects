@@ -16,10 +16,6 @@ Build a secure cross-account IAM access pattern where a Lambda function in Accou
 - API Gateway integration
 - Cross-account access patterns
 
-I had learned that putting credentials on Lambda code can be risky especially when testing this lab in a sandbox environment. 
-STS (Security Token Service) should always be put in place and credential timer should be one hour max. During the process of
-making IAM roles for Lambda and S3, I realized that there is always a set of policies in place to give the certain role, user, or group
-depending on the situation limited access.
 
 ### Step 1: Create Account A (Lambda) role
 1. Go to IAM --> Roles --> Create role
@@ -264,3 +260,5 @@ Deploy to dev stage Lesson: Must create and deploy methods in API Gateway
 
 Error: After modifying API, still getting old responses Root Cause: Didn't deploy API after changes Solution: Click "Deploy API" after any changes Lesson: API Gateway requires explicit deployment
 
+### Summary
+I had learned that putting credentials on Lambda code can be risky especially when testing this lab in a sandbox environment. STS (Security Token Service) should always be put in place and credential timer should be one hour max. During the process of making IAM roles for Lambda and S3, I realized that there is always a set of policies in place to give the certain role, user, or group depending on the situation limited access.
