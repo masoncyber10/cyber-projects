@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print a static message
-        run: echo "Hello world $COMMENT_BODY
+        run: echo "Hello world $COMMENT_BODY"
         env:
           COMMENT_BODY: ${{ github.event.issue.comments }}
         
