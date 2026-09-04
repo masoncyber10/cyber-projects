@@ -1,9 +1,7 @@
 name: test
 
 
-on:
-  issue_comment:
-    types: [created]
+on: push
 
 jobs:
   print_comment:
